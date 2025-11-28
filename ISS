@@ -1,0 +1,57 @@
+/*  
+===========================================================
+                BOT WHATSAPP MULTICOMANDOS
+===========================================================
+Incorpora:
+- /help
+- /sticker
+- #tag
+- /welcome
+- #playmusic
+===========================================================
+*/
+
+const fs = require("fs");
+const { Client, LocalAuth } = require("whatsapp-web.js");
+const ytsr = require("ytsr");
+const ytdl = require("ytdl-core");
+const { Sticker, StickerTypes } = require("wa-sticker-formatter");
+
+// ------------------------------------
+// INICIAR CLIENTE
+// ------------------------------------
+const client = new Client({
+  authStrategy: new LocalAuth()
+});
+
+client.on("ready", () => {
+  console.log("BOT LISTO ✔");
+});
+
+client.initialize();
+
+// ------------------------------------
+// PREFIJOS
+// ------------------------------------
+const prefixes = ["!", "/", "#"];
+
+// ------------------------------------
+// SISTEMA DE COMANDOS
+// ------------------------------------
+client.on("message_create", async (message) => {
+  if (!message.body) return;
+
+  const msg = message.body;
+
+  // ¿Tiene prefijo?
+  const usedPrefix = prefixes.find(p => msg.startsWith(p));
+  if (!usedPrefix) return;
+
+  const withoutPrefix = msg.slice(usedPrefix.length).trim();
+  const split = withoutPrefix.split(" ");
+  const command = split.shift().toLowerCase();
+  const args = split;
+
+  // Función auxiliar para enviar mensajes
+  const sendMessage = (to, content, type) => {
+    return client.sendMessage(to, content, type ? { sendMediaAsSticker:
